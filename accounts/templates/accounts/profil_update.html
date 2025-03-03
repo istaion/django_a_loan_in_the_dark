@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<form method="post" class="bg-white p-6 rounded-lg shadow-md" enctype="multipart/form-data">
+    {% csrf_token %}
+    <div class="mb-4">
+        {{form.as_p}}
+    </div>
+    <br></br>
+    <button type="submit" class="btn text-lg">Envoyer</button>
+</form>
+</div>
+
+{% endblock %}

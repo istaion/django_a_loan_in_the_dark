@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="max-w-md mx-auto bg-white p-8 rounded-lg shadow-md">
+    <h2 class="text-2xl font-bold mb-6">Demander une garantie de pret</h2>
+    <form method="post" class="bg-white p-6 rounded-lg shadow-md">
+        {% csrf_token %}
+        <div class="mb-4">
+            {{form.as_p}}
+        </div>
+        <br></br>
+        <button type="submit" class="btn text-lg">Envoyer</button>
+    </form>
+</div>
+{% endblock %}

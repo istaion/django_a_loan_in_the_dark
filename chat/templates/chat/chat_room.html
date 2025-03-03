@@ -1,0 +1,127 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'chat/css/chat.css' %}">
+
+<div id="chat-container" data-user-email="{{ user_info.email }}" data-user-id="{{user_info.id}}" data-is-staff="{{ user_info.is_staff|yesno:'true,false' }}" class="container-fluid chat-container py-4">
+    <!-- Licorne qui dort -->
+    <div class="sleeping-unicorn">
+        <img src="{% static 'chat/images/sleeping-unicorn.png' %}" alt="Licorne qui dort">
+        <div class="zzz">
+            <span>Z</span>
+            <span>Z</span>
+            <span>Z</span>
+        </div>
+    </div>
+    <!-- Online Users Button -->
+    <div class="online-users-container">
+        <button class="online-users-button" onclick="toggleOnlineUsers()">
+            <span>Utilisateurs en ligne (<span id="online-count">0</span>)</span>
+            <span class="arrow-down"></span>
+        </button>
+        
+        <div id="online-users-overlay" class="online-users-overlay">
+            <h4 class="mb-3 text-white">Utilisateurs en ligne</h4>
+            <ul id="online-users" class="list-group">
+                <!-- Les utilisateurs en ligne seront ajoutés dynamiquement ici -->
+            </ul>
+        </div>
+    </div>
+    
+    <!-- Chat Columns -->
+    <div class="chat-wrapper">
+        <!-- General Chat -->
+        <div class="chat-column">
+            <div id="general-panel" class="chat-panel">
+                <div class="card chat-card">
+                    <div class="card-header chat-header">
+                        <h3 class="chat-title">Chat général</h3>
+                        <div class="header-description">Forum général en direct</div>
+                    </div>
+                    <div id="general-messages" class="chat-messages">
+                        {% for message in public_messages %}
+                            <div class="message {% if message.is_staff %}staff-message{% else %}user-message{% endif %} p-2 mb-2" data-message-id="{{ message.id }}">
+                                <strong class="text-white">
+                                    {{ message.user.email }} 
+                                    <img src="{{ message.user.profile_picture.url }}" alt="Profile Picture" class="rounded-circle" width="40" height="40">
+                                    {% if message.is_staff %}
+                                        <span class="badge bg-warning text-dark">conseiller</span>
+                                    {% else %}
+                                        <span class="role-badge">utilisateur</span>
+                                    {% endif %}
+                                </strong>
+                                <span class="message-timestamp">{{ message.formatted_timestamp|date:"d/m H:i" }}</span>
+                                <div class="text-white">{{ message.content }}</div>
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="card-footer">
+                        <form id="general-form">
+                            <div class="input-group">
+                                <input type="text" id="general-input" class="form-control" placeholder="Tapez votre message...">
+                                <button type="submit" class="btn btn-primary">Envoyer</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Private Chat -->
+        <div class="chat-column">
+            <div id="private-panel" class="chat-panel">
+                <div class="card chat-card">
+                    <div class="card-header chat-header private-header">
+                        <h3 class="chat-title">Chat privé</h3>
+                        <div class="header-description">Contactez un assistant qui vous répondra dans la minute</div>
+                    </div>
+                    <div id="private-messages" class="chat-messages">
+                        {% for message in private_messages %}
+                            <div class="message {% if message.is_staff %}staff-message{% else %}user-message{% endif %} p-2 mb-2" 
+                                 data-message-id="{{ message.id }}" 
+                                 data-user-id="{{ message.user.id }}" 
+                                 data-user-email="{{ message.user.email }}" data-user-img="{{ message.user.profile_picture.url }}">
+                                <strong class="text-white">
+                                    {{ message.user.email }} 
+                                    <img src="{{ message.user.profile_picture.url }}" alt="Profile Picture" class="rounded-circle" width="40" height="40">
+                                    {% if message.is_staff %}
+                                        <span class="badge bg-warning text-dark">conseiller</span>
+                                    {% else %}
+                                        <span class="role-badge">utilisateur</span>
+                                    {% endif %}
+                                </strong>
+                                <span class="message-timestamp">{{ message.formatted_timestamp|date:"d/m H:i" }}</span>
+                                <div class="text-white">{{ message.content }}</div>
+                                {% if user_info.is_staff and not message.is_staff %}
+                                <div class="reply-actions mt-1">
+                                    <button class="reply-btn btn btn-sm btn-outline-light" onclick="replyToMessage('{{ message.id }}', '{{ message.user.id }}', '{{ message.user.email }}')">Répondre</button>
+                                </div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                    </div>
+                    <div class="card-footer">
+                        <div id="reply-info" class="reply-info">
+                            Réponse à <span id="reply-user"></span>
+                            <button type="button" class="btn-close float-end" onclick="cancelReply()"></button>
+                        </div>
+                        <form id="private-form">
+                            <input type="hidden" id="recipient-id" value="">
+                            <input type="hidden" id="reply-to-id" value="">
+                            <div class="input-group">
+                                <input type="text" id="private-input" class="form-control" placeholder="Message privé...">
+                                <button type="submit" class="btn btn-primary">Envoyer</button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascript %}
+<script src="{% static 'chat/js/chat.js' %}"></script>
+{% endblock %}

@@ -1,0 +1,15 @@
+django>=4.2.0
+channels>=4.0.0
+channels-redis>=4.1.0
+requests>=2.31.0
+django-cors-headers==4.7.0
+
+#COMMANDES REDIS
+#sudo service redis stop
+# ou
+#sudo systemctl stop redis
+
+# Puis redémarrer
+#sudo service redis start
+# ou
+#sudo systemctl start redis

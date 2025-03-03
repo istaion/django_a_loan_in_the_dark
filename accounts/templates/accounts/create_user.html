@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<form method="post">
+    <div class="mb-3">
+        <h1>Créer un compte client</h1>
+    </div>
+
+    {% csrf_token %}
+
+    <div class="mb-3">
+      <label for="email" class="form-label">Email</label>
+        {{ form.email }}
+      <div id="email" class="form-text">Saisissez une adresse mail valide</div>
+    </div>
+
+    <div class="mb-3">
+        <label for="username" class="form-label">Nom de l'entreprise</label>
+        {{ form.username }}
+        <div id="username" class="form-text">Saisissez le nom de l'entreprise</div>
+    </div>
+
+    <div class="mb-3">
+        <label for="last_name" class="form-label">Nom</label>
+        {{ form.last_name }}
+        <div id="last_name" class="form-text">Saisissez un nom</div>
+    </div>
+
+    <div class="mb-3">
+        <label for="first_name" class="form-label">Prénom</label>
+        {{ form.first_name }}
+        <div id="first_name" class="form-text">Saisissez un prénom</div>
+    </div>
+
+    <div class="mb-3">
+        <label for="phone_number" class="form-label">Numéro de téléphone</label>
+        {{ form.phone_number }}
+        <div id="phone_number" class="form-text">Saisissez un numéro de téléphone</div>
+    </div>
+
+    <button type="submit" class="btn btn-dark"><b>Créer le compte</b></button>
+</form>
+</div>
+
+{% endblock %}

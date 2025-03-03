@@ -1,0 +1,276 @@
+/* chat.css - À placer dans static/chat/css/chat.css */
+
+/* Dark mode styling */
+body {
+  background-color: #000000;
+  color: #e0e0e0;
+}
+
+html, body {
+  overflow-y: hidden;
+  height: 100%;
+}
+
+.chat-container {
+  background-color: #121212;
+  height: calc(100vh - 80px); /* ajustez selon la hauteur de votre header */
+  overflow-y: hidden;
+  display: flex;
+  flex-direction: column;
+  padding-bottom: 20px;
+}
+
+.card {
+  background-color: #1e1e1e;
+  border-color: #333;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.card-header {
+  background-color: #252525;
+  border-color: #333;
+  padding: 0.75rem 1rem;
+}
+
+.card-footer {
+  background-color: #1e1e1e;
+  border-top: 1px solid #333;
+  padding: 15px;
+}
+
+.input-group .form-control {
+  background-color: #2d2d2d;
+  color: #e0e0e0;
+  border-color: #444;
+}
+
+.input-group .form-control::placeholder {
+  color: #aaa;
+}
+.chat-title {
+  color: #ffffff;
+  font-weight: 600;
+  margin-bottom: 0;
+}
+.input-group .btn-primary {
+  background-color: #0d6efd;
+}
+
+.message {
+  border-bottom: 1px solid #333;
+  color: white;
+}
+
+.user-message {
+  background-color: #252525;
+}
+
+.staff-message {
+  background-color: #1d3245;
+}
+
+/* Chat layout */
+.chat-wrapper {
+  display: flex;
+  gap: 20px;
+  margin-top: 20px;
+  flex: 1;
+  min-height: 0; /* Important pour éviter le débordement */
+  overflow: hidden;
+}
+
+.chat-column {
+  flex: 1;
+  max-width: 50%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+
+.chat-panel {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+  overflow: hidden;
+}
+
+.chat-messages {
+  flex: 1;
+  overflow-y: auto;
+  padding: 15px;
+  min-height: 0; /* Important pour permettre le scroll */
+}
+
+/* Online users overlay */
+.online-users-container {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.online-users-button {
+  width: 100%;
+  text-align: left;
+  background-color: #252525;
+  border: 1px solid #333;
+  color: #e0e0e0;
+  padding: 10px 15px;
+  border-radius: 5px;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.online-users-overlay {
+  display: none;
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  z-index: 1000;
+  background-color: #252525;
+  border: 1px solid #333;
+  border-radius: 5px;
+  padding: 15px;
+  margin-top: 5px;
+  max-height: 300px;
+  overflow-y: auto;
+}
+
+.online-users-overlay.show {
+  display: block;
+}
+
+.reply-info {
+  display: none;
+  background-color: #2d2d2d;
+  padding: 8px;
+  margin-bottom: 10px;
+  border-radius: 4px;
+  color: white; /* Ajouté pour le texte blanc */
+}
+
+#reply-user {
+  color: white; /* Assure que l'utilisateur spécifique est aussi en blanc */
+  font-weight: bold; /* Rend le nom d'utilisateur en gras */
+}
+
+.avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-weight: bold;
+  color: white;
+}
+
+.badge {
+  margin-left: 5px;
+}
+
+.role-badge {
+  background-color: #0d6efd;
+  color: white;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 0.25rem;
+  margin-left: 0.25rem;
+}
+
+.header-description {
+  font-size: 0.8rem;
+  color: #aaa;
+  margin-top: 3px;
+}
+
+.arrow-down {
+  margin-left: 5px;
+  width: 0;
+  height: 0;
+  border-left: 5px solid transparent;
+  border-right: 5px solid transparent;
+  border-top: 5px solid #fff;
+  display: inline-block;
+  vertical-align: middle;
+  transition: transform 0.3s;
+}
+
+.online-users-button:hover .arrow-down {
+  transform: translateY(3px);
+}
+
+.message-timestamp {
+  color: #aaa;
+  font-size: 0.8rem;
+}
+
+/* Licorne qui dort */
+.sleeping-unicorn {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+    width: 100px;
+    height: 100px;
+  }
+  
+  .sleeping-unicorn img {
+    width: 100%;
+    height: auto;
+  }
+  
+  /* Animation des ZZZ */
+  .zzz {
+    position: absolute;
+    top: -15px;
+    right: 10px;
+    display: flex;
+  }
+  
+  .zzz span {
+    color: white;
+    font-weight: bold;
+    font-family: 'Comic Sans MS', cursive;
+    opacity: 0;
+    animation: float 3s infinite;
+    transform: translateY(0);
+    font-size: 20px;
+    margin-left: 5px;
+  }
+  
+  .zzz span:nth-child(1) {
+    animation-delay: 0s;
+    font-size: 15px;
+  }
+  
+  .zzz span:nth-child(2) {
+    animation-delay: 0.5s;
+    font-size: 20px;
+  }
+  
+  .zzz span:nth-child(3) {
+    animation-delay: 1s;
+    font-size: 25px;
+  }
+  
+  @keyframes float {
+    0% {
+      opacity: 0;
+      transform: translateY(0);
+    }
+    25% {
+      opacity: 1;
+    }
+    75% {
+      opacity: 1;
+      transform: translateY(-20px);
+    }
+    100% {
+      opacity: 0;
+      transform: translateY(-40px);
+    }
+  }

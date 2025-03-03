@@ -1,0 +1,35 @@
+[
+    {
+        "id": "dab861b9-fd07-4ae4-97e5-bbc9fb086025",
+        "email": "vic@staff.fr",
+        "is_staff": true,
+        "is_active": true,
+        "first_connection": true,
+        "first_name": null,
+        "last_name": null,
+        "phone_number": null,
+        "advisor_id": null
+    },
+    {
+        "id": "b0077461-ca7f-466b-bcf4-c6dc55f7d23e",
+        "email": "nico@staff.fr",
+        "is_staff": true,
+        "is_active": true,
+        "first_connection": true,
+        "first_name": null,
+        "last_name": null,
+        "phone_number": null,
+        "advisor_id": null
+    },
+    {
+        "id": "5539a3d4-e011-4c93-b15b-9c6b1ee606ed",
+        "email": "leo@staff.fr",
+        "is_staff": true,
+        "is_active": true,
+        "first_connection": true,
+        "first_name": null,
+        "last_name": null,
+        "phone_number": null,
+        "advisor_id": null
+    }
+]

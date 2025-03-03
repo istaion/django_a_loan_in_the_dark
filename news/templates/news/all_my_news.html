@@ -1,0 +1,55 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Gestion de mes publications{% endblock %}
+
+{% block content %}
+<ul class="nav justify-content-center">
+    <li class="nav-item">
+      <a class="nav-link active text-dark" aria-current="page" href="{% url "news:all_news" %}"><b>Voir les actualités</b></a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link active text-dark" aria-current="page" href="{% url "news:my_news" %}"><b>Gérer mes publications</b></a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link text-dark" href="{% url "news:create_news" %}"><b>Créer une publication</b></a>
+    </li>
+  </ul>
+
+
+<div class="m-4">
+    <a class="text-dark" href="{% url "news:all_news" %}"><b>Retour</b></a>
+</div>
+
+<div class="container">
+    <h1>Gestion de mes publications</h1>
+    <div class="card shadow mb-4">
+        <div class="card-body">
+            <table class="table table-striped">
+                <thead>
+                    <tr>
+                        <th>Id</th>
+                        <th>Titre</th>
+                        <th>Date Création</th>
+                        <th>Modification</th>
+                        <th>Suppression</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for news in my_news %}
+                    <tr>
+                        <td>{{news.id}}</td>
+                        <td>{{news.title}}</td>
+                        <td>{{news.publication_date}}</td>
+                        <td><a class="btn btn-success" href="/news/edit/{{news.id}}">Modifier</a></td>
+                        <td><a class="btn btn-danger" href="/news/delete/{{news.id}}">Supprimer</a></td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+
+
+{% endblock %}

@@ -1,0 +1,36 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block content %}
+<div class="bg-white rounded-lg shadow p-6">
+    <h2 class="text-2xl font-bold mb-6">Les clients</h2>
+
+    <table class="w-full text-sm text-center rtl:text-right text-gray-500 dark:text-gray-400" border="1">
+        <thead>
+            <tr class="text-lg">
+                <th>Nom de la compagnie</th>
+                <th>Email</th>
+                <th>Status de la demande</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for user in users %}
+                <tr>
+                    <td>{{ user.username }}</td>
+                    <td>{{ user.email }}</td>
+                    {% if user.loan %}
+                    <td><p>status de la demande : {{ user.loan.status }}</p>
+                    <form action="{% url 'loans:advisor_loan' pk=user.loan.id %}" method="get">
+                        {% csrf_token %}
+                        <button type="submit" class="nav-link">Détail</button>
+                    </form></td>
+                    {% else  %}
+                    <td><p>Cette entreprise n'a pas encore fait de demande</p></td>
+                    {% endif %}
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+{% endblock %}

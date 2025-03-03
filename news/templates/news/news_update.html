@@ -1,0 +1,41 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}modifier une publication{% endblock %}
+
+{% block content %}
+<ul class="nav justify-content-center">
+  <li class="nav-item">
+    <a class="nav-link active text-dark" aria-current="page" href="{% url "news:all_news" %}"><b>Voir les actualités</b></a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link active text-dark" aria-current="page" href="{% url "news:my_news" %}"><b>Gérer mes publications</b></a>
+  </li>
+  <li class="nav-item">
+    <a class="nav-link text-dark" href="{% url "news:create_news" %}"><b>Créer une publication</b></a>
+  </li>
+</ul>
+
+<div class="m-4">
+  <a class="text-dark" href="{% url "news:my_news" %}"><b>Retour</b></a>
+</div>
+
+<div class= "container">
+  <br>
+  <div class="container bg-white p-4 rounded">
+    <form method="post" enctype="multipart/form-data">
+        {% csrf_token %}
+
+        <div class="mb-3">
+            <h1>Modifier un article</h1>
+        </div>
+        {{ form.as_p }}
+
+        <button type="submit" class="btn btn-dark"><b>Mettre à jour</b></button>
+    </form>
+  </div>
+</div>
+
+
+
+{% endblock %}

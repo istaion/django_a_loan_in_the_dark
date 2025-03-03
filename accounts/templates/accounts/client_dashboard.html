@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="bg-white rounded-lg shadow p-6">
+    <h2 class="text-2xl font-bold mb-6">Mon espace client</h2>
+    <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="border rounded p-4">
+            <h3 class="text-lg font-semibold mb-4">Ma demandes de garantie de prêt</h3>
+            {% if loan.status == "en attente" %}
+                <span>
+                    Votre demande est en cours de traitement
+                    <form action="{% url 'loans:loan_update' pk=request.user.loan.id %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="nav-link">modifier ma demande</button>
+                    </form>
+                </span>
+            {% elif loan.status == "refusé" %}
+                <p>Votre demande a été refusé</p>
+            {% elif loan.status == "accepté" %}
+                <p>Votre demande a été accepté</p>
+            {% else %}
+                <span>
+                    Vous n'avez pas encore fait de demande
+                    <form action="{% url 'loans:loan_create' %}" method="post">
+                    {% csrf_token %}
+                    <button type="submit" class="nav-link">faire une demande</button>
+                    </form>
+                </span>
+            {% endif %}
+        </div>
+        <div class="border rounded p-4">
+            <h3 class="text-lg font-semibold mb-4">Profil</h3>
+            <a class="nav-link" href="{% url 'accounts:profil' pk=request.user.id %}">Voir mon profil</a>
+            <a class="nav-link" href="{% url 'accounts:user_edit' pk=request.user.id %}">Modifier mon profil</a>
+        </div>
+    </div>
+</div>
+</div>
+
+{% endblock %}

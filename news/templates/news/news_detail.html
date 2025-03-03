@@ -1,0 +1,53 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Détails d'une actualité{% endblock %}
+
+{% block content %}
+<ul class="nav justify-content-center">
+    <li class="nav-item">
+      <a class="nav-link active text-dark" aria-current="page" href="{% url "news:all_news" %}"><b>Voir les actualités</b></a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link active text-dark" aria-current="page" href="{% url "news:my_news" %}"><b>Gérer mes publications</b></a>
+    </li>
+    <li class="nav-item">
+      <a class="nav-link text-dark" href="{% url "news:create_news" %}"><b>Créer une publication</b></a>
+    </li>
+  </ul>
+
+<div class="m-4">
+    <a class="text-dark" href="{% url "news:all_news" %}"><b>Retour</b></a>
+</div>
+
+<div class= "container">
+    <br>
+    <h1 class="font-title text-center pb-2"><b>Publication n° {{news.id}}</b></h1>
+    <div class="container bg-white p-4 rounded">
+
+      <div class= "row justify-content-center">
+
+        <div class= "col-12 text-center">
+            <h2 class="text-uppercase"><b>{{ news.title }}</b></h2>
+
+            <div class= "col-12">
+                {% if news.picture %}
+                <img src="{{ news.picture.url }}" class="card-img-top w-50" alt="{{ news.title }}">
+                {% else %}
+                <img src="https://cdn.pixabay.com/photo/2018/04/07/18/46/danbo-3299229_1280.jpg" class="card-img-top w-50" alt="no_picture">
+                {% endif %}
+            </div>
+
+            <p class="card-text">{{ news.content }}</p>
+            <p class="card-text"><b>Auteur :</b> {{ news.author }}</p>
+            <p class="card-text"><small class="text-body-secondary">Publication : {{ news.publication_date }}</small></p>
+        </div>
+  
+
+      </div>
+    </div>
+</div>
+
+
+
+{% endblock %}
