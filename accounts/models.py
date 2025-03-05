@@ -10,7 +10,7 @@ class CustomUser(AbstractUser):
     email = models.EmailField(unique=True)
     username = models.CharField(max_length=100, null=True, blank=True)
     api_token = models.CharField(max_length=255, null=True, blank=True)
-    profile_picture = models.ImageField(upload_to='accounts', null=True, blank=True)
+    profile_picture = models.ImageField(upload_to='accounts', max_length=500, null=True, blank=True)
     phone_number = models.CharField(max_length=55, null=True, blank=True)
     advisor =  models.ManyToManyField("self", symmetrical=False)
 
