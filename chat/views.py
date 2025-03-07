@@ -9,11 +9,12 @@ def chat_room(request, chat_type):
 
     # Si c'est un chat privé, on vérifie si l'utilisateur a des conversations privées existantes
     if chat_type == 'private':
-        # Pour un chat privé, on peut éventuellement vérifier la liste des utilisateurs avec qui l'utilisateur est en chat privé
-        # En fonction de tes règles métiers, tu peux ajuster cette logique
-        pass
-
-    chat_messages = ChatMessage.objects.filter(message_type=chat_type).order_by('timestamp')
+        if request.user.is_staff:
+            chat_messages = ChatMessage.objects.filter(message_type=chat_type).order_by('timestamp')
+        else:
+            chat_messages = ChatMessage.objects.filter(message_type=chat_type, recipient=request.user).order_by('timestamp')
+    else:
+        chat_messages = ChatMessage.objects.filter(message_type=chat_type).order_by('timestamp')
 
     return render(request, 'chat/chat_room.html', {
         'chat_type': chat_type,

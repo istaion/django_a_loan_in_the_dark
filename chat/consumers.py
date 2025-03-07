@@ -26,17 +26,21 @@ class ChatConsumer(AsyncWebsocketConsumer):
         user = self.scope["user"]
         content = data['message']
         message_type = data.get('type', 'public')
-        recipient_email = data.get('recipient', None)
-
+        recipient_id = data.get('recipient_id', None)
         recipient = None
-        if recipient_email:
+        
+        if recipient_id:
             try:
-                recipient = await database_sync_to_async(CustomUser.objects.get)(email=recipient_email)
-            except CustomUser.DoesNotExist:
+                # Recherche par ID, pas par email
+                recipient = await database_sync_to_async(CustomUser.objects.get)(id=recipient_id)
+            except (CustomUser.DoesNotExist, ValueError):
                 recipient = None
-                
+        
         message = await self.save_message(user, content, message_type, recipient)
-
+        
+        # Convertir UUID en chaîne de caractères
+        recipient_id_str = str(recipient.id) if recipient else None
+        
         await self.channel_layer.group_send(
             self.room_group_name,
             {
@@ -45,7 +49,8 @@ class ChatConsumer(AsyncWebsocketConsumer):
                 'message': message.content,
                 'timestamp': message.formatted_timestamp,
                 'message_type': message.message_type,
-                'recipient': recipient.email if recipient else None,
+                'recipient_id': recipient_id_str,  # UUID converti en chaîne
+                'is_staff': user.is_staff,
             }
         )
 
@@ -54,10 +59,13 @@ class ChatConsumer(AsyncWebsocketConsumer):
         message = event['message']
         timestamp = event['timestamp']
         message_type = event['message_type']
-        recipient = event['recipient']
-
+        recipient_id = event['recipient_id']  # Maintenant c'est une chaîne
+        is_staff = event.get('is_staff', False)
+        
         if message_type == 'private':
-            if self.scope["user"].is_staff or self.scope["user"].email == recipient:
+            # Si l'utilisateur actuel est le staff ou le destinataire
+            current_user_id = str(self.scope["user"].id)  # Convertir UUID en chaîne
+            if self.scope["user"].is_staff or (recipient_id and current_user_id == recipient_id):
                 await self.send(text_data=json.dumps(event))
         else:
             await self.send(text_data=json.dumps(event))

@@ -11,7 +11,7 @@
             <span class="chat-content">{{ message.content }}</span>
 
             {% if user.is_staff and not message.user.is_staff and not chat_type == 'public' %}
-                <button class="reply-button" data-recipient="{{ message.user.id }}" data-recipient-name="{{ message.user.email }}">Répondre</button>
+              <button class="reply-button" data-recipient="{{ message.user.id }}" data-recipient-name="{{ message.user.email }}">Répondre</button>
             {% endif %}
         </div>
     {% endfor %}
@@ -41,12 +41,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Fonction pour envoyer un message
     function sendMessage(message, recipientId = null) {
-        chatSocket.send(JSON.stringify({
-            'message': message,
-            'type': chatType,
-            'recipient': recipientId  // Envoie avec l'ID du destinataire si réponse
-        }));
-    }
+      chatSocket.send(JSON.stringify({
+          'message': message,
+          'type': chatType,
+          'recipient_id': recipientId
+      }));
+  }
 
     // Lorsqu'on reçoit un message
     chatSocket.onmessage = function (e) {
@@ -83,8 +83,13 @@ document.addEventListener("DOMContentLoaded", function () {
     document.getElementById('send-button').onclick = function () {
         const messageInput = document.getElementById('chat-input');
         const message = messageInput.value;
+        let recipientId = replyingTo;
+
+        if (chatType === 'private' && "{{ user.is_staff }}" === "False") {
+          recipientId = "{{ user.id }}";  // L'ID de l'utilisateur est envoyé en tant que destinataire
+        }
         
-        sendMessage(message, replyingTo); // Envoi avec l'ID du destinataire si en réponse
+        sendMessage(message, recipientId); // Envoi avec l'ID du destinataire si en réponse
 
         // Réinitialise l'input et la réponse sélectionnée
         messageInput.value = '';
@@ -93,12 +98,12 @@ document.addEventListener("DOMContentLoaded", function () {
 
     // Gérer le clic sur "Répondre"
     document.querySelectorAll('.reply-button').forEach(button => {
-        button.addEventListener('click', function () {
-            const recipientId = this.getAttribute('data-recipient');
-            const recipientName = this.getAttribute('data-recipient-name');
-            setReplyTo(recipientId, recipientName);
-        });
-    });
+      button.addEventListener('click', function () {
+          const recipientId = this.getAttribute('data-recipient');
+          const recipientName = this.getAttribute('data-recipient-name');
+          setReplyTo(recipientId, recipientName);
+      });
+  });
 
     // Gérer le bouton "Annuler"
     cancelReplyButton.addEventListener("click", function () {
