@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from django.http import Http404
+from chat.models import ChatMessage
 
 def chat_room(request, chat_type):
     # On vérifie si le type de chat est valide (général ou privé)
@@ -12,7 +13,10 @@ def chat_room(request, chat_type):
         # En fonction de tes règles métiers, tu peux ajuster cette logique
         pass
 
+    chat_messages = ChatMessage.objects.filter(message_type=chat_type).order_by('timestamp')
+
     return render(request, 'chat/chat_room.html', {
         'chat_type': chat_type,
         'user': request.user,
+        'chat_messages': chat_messages
     })

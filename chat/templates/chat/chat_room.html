@@ -2,61 +2,122 @@
 {% load static %}
 
 {% block content %}
-  <h1>Chat {% if chat_type == 'public' %}général{% else %}privé{% endif %}</h1>
+<h1>Chat {% if chat_type == 'public' %}général{% else %}privé{% endif %}</h1>
 
-  <div id="chat-messages"></div>
+<div id="chat-messages">
+    {% for message in chat_messages %}
+        <div class="chat-message">
+            <span class="chat-user">{{ message.user.email }}</span>: 
+            <span class="chat-content">{{ message.content }}</span>
 
-  <!-- Zone pour envoyer des messages -->
-  <textarea id="chat-input" placeholder="Votre message..."></textarea>
-  <button id="send-button">Envoyer</button>
+            {% if user.is_staff and not message.user.is_staff and not chat_type == 'public' %}
+                <button class="reply-button" data-recipient="{{ message.user.id }}" data-recipient-name="{{ message.user.email }}">Répondre</button>
+            {% endif %}
+        </div>
+    {% endfor %}
+</div>
 
-  <script>
-    // Récupère le type de chat (public ou privé)
+<!-- Zone de réponse sélectionnée -->
+<div id="reply-to-container" style="display: none;">
+    <span id="reply-to-text"></span>
+    <button id="cancel-reply">Annuler</button>
+</div>
+
+<!-- Zone pour envoyer des messages -->
+<textarea id="chat-input" placeholder="Votre message..."></textarea>
+<button id="send-button">Envoyer</button>
+
+<script>
+document.addEventListener("DOMContentLoaded", function () {
     const chatType = "{{ chat_type }}";
     const userEmail = "{{ user.email }}";
-
-    // Crée l'URL du WebSocket pour le chat
     const socketUrl = `ws://${window.location.host}/ws/chat/${chatType}/`;
-
-    // Crée une connexion WebSocket
     const chatSocket = new WebSocket(socketUrl);
+    
+    let replyingTo = null;  // Stocke l'ID du destinataire si réponse
+    const replyContainer = document.getElementById("reply-to-container");
+    const replyText = document.getElementById("reply-to-text");
+    const cancelReplyButton = document.getElementById("cancel-reply");
 
-    // Lors de la réception d'un message
-    chatSocket.onmessage = function(e) {
-      const data = JSON.parse(e.data);
-      const messageContainer = document.createElement('div');
-      messageContainer.classList.add('chat-message');
-      
-      // Ajoute un label pour l'utilisateur
-      const userLabel = document.createElement('span');
-      userLabel.classList.add('chat-user');
-      userLabel.textContent = data.user;
-      messageContainer.appendChild(userLabel);
+    // Fonction pour envoyer un message
+    function sendMessage(message, recipientId = null) {
+        chatSocket.send(JSON.stringify({
+            'message': message,
+            'type': chatType,
+            'recipient': recipientId  // Envoie avec l'ID du destinataire si réponse
+        }));
+    }
 
-      // Ajoute le contenu du message
-      const messageContent = document.createElement('span');
-      messageContent.classList.add('chat-content');
-      messageContent.textContent = data.message;
-      messageContainer.appendChild(messageContent);
+    // Lorsqu'on reçoit un message
+    chatSocket.onmessage = function (e) {
+        const data = JSON.parse(e.data);
+        const messageContainer = document.createElement('div');
+        messageContainer.classList.add('chat-message');
 
-      // Ajoute le message au conteneur de messages
-      document.getElementById('chat-messages').appendChild(messageContainer);
+        const userLabel = document.createElement('span');
+        userLabel.classList.add('chat-user');
+        userLabel.textContent = data.user;
+        messageContainer.appendChild(userLabel);
+
+        const messageContent = document.createElement('span');
+        messageContent.classList.add('chat-content');
+        messageContent.textContent = data.message;
+        messageContainer.appendChild(messageContent);
+
+        // Si c'est un staff, ajouter un bouton "Répondre" pour les utilisateurs non-staff
+        if ("{{ user.is_staff }}" === "True" && data.message_type === "private" && !data.is_staff) {
+            const replyButton = document.createElement('button');
+            replyButton.textContent = "Répondre";
+            replyButton.classList.add('reply-button');
+            replyButton.setAttribute('data-recipient', data.user);
+            replyButton.onclick = function () {
+                setReplyTo(data.user);
+            };
+            messageContainer.appendChild(replyButton);
+        }
+
+        document.getElementById('chat-messages').appendChild(messageContainer);
     };
 
-    // Lors de l'envoi d'un message
-    document.getElementById('send-button').onclick = function() {
-      const messageInput = document.getElementById('chat-input');
-      const message = messageInput.value;
+    // Lorsqu'on envoie un message
+    document.getElementById('send-button').onclick = function () {
+        const messageInput = document.getElementById('chat-input');
+        const message = messageInput.value;
+        
+        sendMessage(message, replyingTo); // Envoi avec l'ID du destinataire si en réponse
 
-      // Envoie le message à la WebSocket
-      chatSocket.send(JSON.stringify({
-        'message': message,
-        'type': chatType,  // Le type de chat (public ou privé)
-        'recipient': chatType === 'private' ? 'destinataire_email' : null,  // Peut être dynamique selon le chat privé
-      }));
-
-      messageInput.value = '';  // Réinitialise l'input
+        // Réinitialise l'input et la réponse sélectionnée
+        messageInput.value = '';
+        clearReplyTo();
     };
-  </script>
 
+    // Gérer le clic sur "Répondre"
+    document.querySelectorAll('.reply-button').forEach(button => {
+        button.addEventListener('click', function () {
+            const recipientId = this.getAttribute('data-recipient');
+            const recipientName = this.getAttribute('data-recipient-name');
+            setReplyTo(recipientId, recipientName);
+        });
+    });
+
+    // Gérer le bouton "Annuler"
+    cancelReplyButton.addEventListener("click", function () {
+        clearReplyTo();
+    });
+
+    // Fonction pour afficher "Répondre à..."
+    function setReplyTo(userId, userName) {
+        replyingTo = userId;
+        replyText.textContent = "Répondre à " + userName;
+        replyContainer.style.display = "block";
+    }
+
+    // Fonction pour annuler la réponse
+    function clearReplyTo() {
+        replyingTo = null;
+        replyContainer.style.display = "none";
+        replyText.textContent = "";
+    }
+});
+</script>
 {% endblock %}

@@ -26,12 +26,15 @@ class ChatConsumer(AsyncWebsocketConsumer):
         user = self.scope["user"]
         content = data['message']
         message_type = data.get('type', 'public')
-        recipient_id = data.get('recipient', None)
+        recipient_email = data.get('recipient', None)
 
         recipient = None
-        if recipient_id:
-            recipient = await database_sync_to_async(CustomUser.objects.get)(id=recipient_id)
-
+        if recipient_email:
+            try:
+                recipient = await database_sync_to_async(CustomUser.objects.get)(email=recipient_email)
+            except CustomUser.DoesNotExist:
+                recipient = None
+                
         message = await self.save_message(user, content, message_type, recipient)
 
         await self.channel_layer.group_send(
