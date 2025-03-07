@@ -1,4 +1,3 @@
-
 import json
 import os
 import django
@@ -8,6 +7,7 @@ from django.conf import settings
 os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'djangoApp.settings')  
 django.setup()  
 from accounts.models import CustomUser
+from news.models import New
 
 API_BASE_URL = settings.API_BASE_URL
 LOGIN_ENDPOINT = f"{API_BASE_URL}/auth/login"
@@ -67,6 +67,25 @@ def init_django_db():
             print(f"✅ Photo de profil mise à jour pour {user.email}")
         else:
             print("❌ Utilisateur non trouvé !")
+
+    if not New.objects.filter(title="Les licornes se mettent à la datascience !").exists():
+            new_new = New(
+                title="Les licornes se mettent à la datascience !",
+                author=vic,
+                content="Mais c'est long..."
+            )
+            new_new.save()
+            print(f"✅ News créé avec succès.")
+    else:
+        print(f"🔹 La new existe déjà.")
+    new = New.objects.filter(title="Les licornes se mettent à la datascience !").first()
+    if new:
+        image_path = os.path.join(MEDIA_DIR, "optuna.jpg")
+        with open(image_path, "rb") as image_file:
+            new.picture.save(name, image_file, save=True)
+        print(f"✅ Photo mise à jour pour la news")
+    else:
+        print("❌ News non trouvé !")
 
 # Exécuter la fonction si ce fichier est lancé directement
 if __name__ == "__main__":

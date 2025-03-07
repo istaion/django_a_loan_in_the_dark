@@ -2,127 +2,81 @@
 {% load static %}
 
 {% block content %}
-<h1>Chat {% if chat_type == 'public' %}général{% else %}privé{% endif %}</h1>
-
-<div id="chat-messages">
-    {% for message in chat_messages %}
-        <div class="chat-message">
-            <span class="chat-user">{{ message.user.email }}</span>: 
-            <span class="chat-content">{{ message.content }}</span>
-
-            {% if user.is_staff and not message.user.is_staff and not chat_type == 'public' %}
-              <button class="reply-button" data-recipient="{{ message.user.id }}" data-recipient-name="{{ message.user.email }}">Répondre</button>
-            {% endif %}
+<div class="container py-4">
+    <div class="card shadow">
+        <div class="card-header bg-primary text-white">
+            <h4 class="mb-0">Chat {% if chat_type == 'public' %}général{% else %}privé{% endif %}</h4>
         </div>
-    {% endfor %}
+        <div class="card-body">
+            <div class="row">
+                <div class="col-12">
+                    <!-- Messages du chat -->
+                    <div id="chat-messages" class="chat-container mb-3 p-3 border rounded" style="height: 400px; overflow-y: auto;">
+                        {% for message in chat_messages %}
+                            <div class="chat-message mb-2 {% if message.user == user %}text-end{% endif %}">
+                                <div class="message-bubble d-inline-block p-2 rounded {% if message.user == user %}bg-primary text-white{% else %}bg-light{% endif %}">
+                                    <div class="message-header d-flex justify-content-between align-items-center mb-1">
+                                        <div class="d-flex align-items-center">
+                                            <img src="{{ message.user.profile_picture.url|default:'static/images/default-avatar.png' }}" 
+                                                 alt="Avatar" 
+                                                 class="rounded-circle me-2" 
+                                                 width="24" height="24">
+                                            <small class="fw-bold">{{ message.user.email }}</small>
+                                        </div>
+                                        <small class="text-muted ms-2">{{ message.formatted_timestamp }}</small>
+                                    </div>
+                                    <div class="message-content">{{ message.content }}</div>
+                                </div>
+                                
+                                {% if user.is_staff and not message.user.is_staff and not chat_type == 'public' %}
+                                    <button class="btn btn-sm btn-outline-secondary reply-button mt-1" 
+                                            data-recipient="{{ message.user.id }}" 
+                                            data-recipient-name="{{ message.user.email }}">
+                                        <i class="bi bi-reply"></i> Répondre
+                                    </button>
+                                {% endif %}
+                            </div>
+                        {% empty %}
+                            <div class="text-center text-muted py-5">
+                                <i class="bi bi-chat-dots" style="font-size: 2rem;"></i>
+                                <p class="mt-2">Aucun message. Soyez le premier à écrire !</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+
+                    <!-- Zone de réponse sélectionnée -->
+                    <div id="reply-to-container" class="alert alert-info d-none mb-2">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <span id="reply-to-text" class="fw-bold"></span>
+                            <button id="cancel-reply" class="btn btn-sm btn-close" aria-label="Annuler"></button>
+                        </div>
+                    </div>
+
+                    <!-- Zone pour envoyer des messages -->
+                    <div class="input-group">
+                        <textarea id="chat-input" class="form-control" placeholder="Votre message..." rows="2"></textarea>
+                        <button id="send-button" class="btn btn-primary">
+                            <i class="bi bi-send"></i> Envoyer
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 </div>
 
-<!-- Zone de réponse sélectionnée -->
-<div id="reply-to-container" style="display: none;">
-    <span id="reply-to-text"></span>
-    <button id="cancel-reply">Annuler</button>
-</div>
-
-<!-- Zone pour envoyer des messages -->
-<textarea id="chat-input" placeholder="Votre message..."></textarea>
-<button id="send-button">Envoyer</button>
-
+{% block extra_css %}
+<style rc="{% static 'chat/css/chat.css' %}">
+</style>
+{% endblock %}
 <script>
-document.addEventListener("DOMContentLoaded", function () {
-    const chatType = "{{ chat_type }}";
-    const userEmail = "{{ user.email }}";
-    const socketUrl = `ws://${window.location.host}/ws/chat/${chatType}/`;
-    const chatSocket = new WebSocket(socketUrl);
-    
-    let replyingTo = null;  // Stocke l'ID du destinataire si réponse
-    const replyContainer = document.getElementById("reply-to-container");
-    const replyText = document.getElementById("reply-to-text");
-    const cancelReplyButton = document.getElementById("cancel-reply");
-
-    // Fonction pour envoyer un message
-    function sendMessage(message, recipientId = null) {
-      chatSocket.send(JSON.stringify({
-          'message': message,
-          'type': chatType,
-          'recipient_id': recipientId
-      }));
-  }
-
-    // Lorsqu'on reçoit un message
-    chatSocket.onmessage = function (e) {
-        const data = JSON.parse(e.data);
-        const messageContainer = document.createElement('div');
-        messageContainer.classList.add('chat-message');
-
-        const userLabel = document.createElement('span');
-        userLabel.classList.add('chat-user');
-        userLabel.textContent = data.user;
-        messageContainer.appendChild(userLabel);
-
-        const messageContent = document.createElement('span');
-        messageContent.classList.add('chat-content');
-        messageContent.textContent = data.message;
-        messageContainer.appendChild(messageContent);
-
-        // Si c'est un staff, ajouter un bouton "Répondre" pour les utilisateurs non-staff
-        if ("{{ user.is_staff }}" === "True" && data.message_type === "private" && !data.is_staff) {
-            const replyButton = document.createElement('button');
-            replyButton.textContent = "Répondre";
-            replyButton.classList.add('reply-button');
-            replyButton.setAttribute('data-recipient', data.user);
-            replyButton.onclick = function () {
-                setReplyTo(data.user);
-            };
-            messageContainer.appendChild(replyButton);
-        }
-
-        document.getElementById('chat-messages').appendChild(messageContainer);
-    };
-
-    // Lorsqu'on envoie un message
-    document.getElementById('send-button').onclick = function () {
-        const messageInput = document.getElementById('chat-input');
-        const message = messageInput.value;
-        let recipientId = replyingTo;
-
-        if (chatType === 'private' && "{{ user.is_staff }}" === "False") {
-          recipientId = "{{ user.id }}";  // L'ID de l'utilisateur est envoyé en tant que destinataire
-        }
-        
-        sendMessage(message, recipientId); // Envoi avec l'ID du destinataire si en réponse
-
-        // Réinitialise l'input et la réponse sélectionnée
-        messageInput.value = '';
-        clearReplyTo();
-    };
-
-    // Gérer le clic sur "Répondre"
-    document.querySelectorAll('.reply-button').forEach(button => {
-      button.addEventListener('click', function () {
-          const recipientId = this.getAttribute('data-recipient');
-          const recipientName = this.getAttribute('data-recipient-name');
-          setReplyTo(recipientId, recipientName);
-      });
-  });
-
-    // Gérer le bouton "Annuler"
-    cancelReplyButton.addEventListener("click", function () {
-        clearReplyTo();
-    });
-
-    // Fonction pour afficher "Répondre à..."
-    function setReplyTo(userId, userName) {
-        replyingTo = userId;
-        replyText.textContent = "Répondre à " + userName;
-        replyContainer.style.display = "block";
-    }
-
-    // Fonction pour annuler la réponse
-    function clearReplyTo() {
-        replyingTo = null;
-        replyContainer.style.display = "none";
-        replyText.textContent = "";
-    }
-});
+  // Ces variables seront accessibles dans votre fichier chat.js
+  const chatTypeData = "{{ chat_type }}";
+  const userEmailData = "{{ user.email }}";
+  const currentUserId = "{{ user.id }}";
+  const isStaff = "{{ user.is_staff }}";
 </script>
+{% block extra_js %}
+<script src="{% static 'chat/js/chat.js' %}"></script>
+{% endblock %}
 {% endblock %}

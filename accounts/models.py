@@ -25,7 +25,7 @@ class CustomUser(AbstractUser):
 
     def save(self, *args, **kwargs):
         if not self.profile_picture:  
-            self.profile_picture.name = os.path.join(MEDIA_DIR, 'default-avatar.jpg')
+            self.profile_picture.name = 'accounts/default-avatar.jpg' 
         
         super().save(*args, **kwargs)
 
