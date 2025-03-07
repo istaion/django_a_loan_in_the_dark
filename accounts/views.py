@@ -30,6 +30,7 @@ class CustomLoginView(LoginView):
         
         try:
             # Essaye de te connecter via l'API
+            print(f"hoooooooooooop : {f"{settings.API_BASE_URL}/auth/login"}")
             response = APIClient.login(email, password)
             if response and 'access_token' in response:
                 token = response['access_token']
@@ -61,6 +62,11 @@ class CustomLoginView(LoginView):
         
         return redirect('accounts:dashboard')
     
+    def form_invalid(self, form):
+        print("❌ form_invalid() - Erreur dans le formulaire")
+        print(form.errors)  # Affiche les erreurs du formulaire
+        return super().form_invalid(form)
+
     def get_redirect_url(self):
         redirect('accounts:dashboard')
 

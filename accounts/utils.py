@@ -10,6 +10,7 @@ class APIClient:
     def login(email, password):
         try:
             url = f"{settings.API_BASE_URL}/auth/login"
+            print(f"url : {url}")
             
             data = {
                 "email": email,

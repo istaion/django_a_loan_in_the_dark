@@ -19,7 +19,7 @@
                     <a class="nav-link" href="{% url 'news:all_news' %}">Actualités</a>
                 </li>
                 <li class="nav-item">
-                    <a class="nav-link" href="{% url 'chat:chat_room' %}">Chat</a> 
+                    <a class="nav-link" href="{% url 'chat:chat_room' chat_type="public" %}">Chat</a> 
                 </li>
                 <li class="nav-item">
                     <form action="{% url 'accounts:logout' %}" method="post">
