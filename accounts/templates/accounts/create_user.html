@@ -38,7 +38,17 @@
         {{ form.phone_number }}
         <div id="phone_number" class="form-text">Saisissez un numéro de téléphone</div>
     </div>
-
+    {% if form.errors %}
+    <div class="alert alert-danger">
+        <ul>
+            {% for field, errors in form.errors.items %}
+                {% for error in errors %}
+                    <li><strong>{{ field }}:</strong> {{ error }}</li>
+                {% endfor %}
+            {% endfor %}
+        </ul>
+    </div>
+    {% endif %}
     <button type="submit" class="btn btn-dark"><b>Créer le compte</b></button>
 </form>
 </div>

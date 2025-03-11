@@ -16,6 +16,7 @@ from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
+load_dotenv(override=True)
 dotenv_path = os.path.join(BASE_DIR, ".env")
 
 
@@ -213,15 +214,19 @@ CHANNEL_LAYERS = {
     "default": {
         "BACKEND": "channels_redis.core.RedisChannelLayer",
         "CONFIG": {
-            "hosts": [("127.0.0.1", 6379)],
+            "hosts": [("0.0.0.0", 6379)],
         },
     },
 }
+
+
 
 EMAIL_BACKEND = "django.core.mail.backends.smtp.EmailBackend"
 EMAIL_HOST = "smtp.gmail.com"
 EMAIL_PORT = 587
 EMAIL_USE_TLS = True
 EMAIL_HOST_USER = "ladysimplon@gmail.com"
-EMAIL_HOST_PASSWORD = os.getenv('EMAIL_HOST_PASSWORD')
+EMAIL_HOST_PASSWORD = f"{os.getenv('EMAIL_HOST_PASSWORD1')} {os.getenv('EMAIL_HOST_PASSWORD2')} {os.getenv('EMAIL_HOST_PASSWORD3')} {os.getenv('EMAIL_HOST_PASSWORD4')}"
 DEFAULT_FROM_EMAIL = EMAIL_HOST_USER
+
+print(EMAIL_HOST_PASSWORD)

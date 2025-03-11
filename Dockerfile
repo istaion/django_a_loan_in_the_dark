@@ -16,6 +16,9 @@ RUN curl https://packages.microsoft.com/keys/microsoft.asc | apt-key add - && \
 RUN apt-get update && \
     env ACCEPT_EULA=Y apt-get install -y msodbcsql17
 
+RUN apt-get update && \
+    apt-get install -y redis-server
+
 RUN python3 -m venv /opt/venv
 ENV PATH="/opt/venv/bin:$PATH"
 
@@ -29,6 +32,7 @@ COPY . /app/
 
 EXPOSE 80
 
-CMD python init_db.py && gunicorn --bind 0.0.0.0:80 djangoApp.wsgi
+CMD service redis-server start && python manage.py migrate && python init_db.py && daphne -b 0.0.0.0 -p 80 djangoApp.asgi:application
+
 
 

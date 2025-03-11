@@ -139,18 +139,21 @@ class CreateUserView(CreateView):
     
 
     def form_valid(self, form):
+        print("form is called !")
         token = self.request.user.api_token
         headers = {
                 "Authorization": f"Bearer {token}",
                 "Accept": "application/json"
             }
         api_url = os.getenv("API_BASE_URL", settings.API_BASE_URL) + "/create_user"
+        print(f"api_url : {api_url}")
         django_data = form.cleaned_data
         password = self.generate_password()
         django_data["password"] = password
         try:
             response = requests.post(api_url, json=django_data, headers=headers)
             data = response.json()
+            print(data)
             if response.status_code == 201:
                 form.instance.id = data.get("id")
                 form.instance.set_password(password)
@@ -170,6 +173,10 @@ class CreateUserView(CreateView):
         message = f"Bonjour,\n\nVotre compte a été créé avec succès !\n\nVoici vos identifiants :\nEmail: {email}\nMot de passe: {password}\n\nVeuillez vous connecter et modifier votre mot de passe dès que possible.\n\nCordialement,\nL'équipe."
         from_email = settings.DEFAULT_FROM_EMAIL
         send_mail(subject, message, from_email, [email])
+    
+    def form_invalid(self, form):
+        print("form_invalid is called!")
+        return super().form_invalid(form)
 
 class UserListView(ListView):
     model = CustomUser
